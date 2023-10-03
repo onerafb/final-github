@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 const schema = new mongoose.Schema({
-  CreatedAt: {
+  createdAt: {
     type: Date,
     default: Date.now,
   },

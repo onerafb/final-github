@@ -3,6 +3,7 @@ import { User } from "../models/User.js";
 import { Course } from "../models/Course.js";
 import { sendToken } from "../utils/sendToken.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import { Stats } from "../models/Stat.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import crypto from "crypto";
 import cloudinary from "cloudinary";
@@ -300,4 +301,14 @@ export const deleteMyProfile = catchAsyncErrors(async (req, res, next) => {
       success: true,
       message: "User deleted",
     });
+});
+
+User.watch().on("change", async () => {
+  const stats = await Stats.find({}).sort({ createdAt: "desc" }).limit(1);
+
+  const subscription = await User.find({ "subscription.status": "active" });
+  stats[0].users = await User.countDocuments();
+  stats[0].subscription = subscription.length;
+  stats[0].createdAt = new Date(Date.now());
+  await stats[0].save()
 });
